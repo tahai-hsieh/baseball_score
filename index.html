@@ -30,43 +30,71 @@
 
         /* 中部區域 */
         .main-scoreboard { display: flex; justify-content: space-between; align-items: center; width: 100%; flex-grow: 1; margin: 10px 0; }
-        .team-box { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 30%; }
+        .team-box { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 28%; }
         
-        /* 隊名輸入框樣式（控制端） */
         .team-input {
-            background: #111;
-            color: #fff;
-            border: 1px solid #444;
-            border-radius: 6px;
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            width: 140px;
-            padding: 4px;
-            user-select: text; /* 允許點擊選取文字輸入 */
+            background: #111; color: #fff; border: 1px solid #444; border-radius: 6px;
+            font-size: 24px; font-weight: bold; text-align: center; width: 140px; padding: 4px; user-select: text;
         }
-        .team-input:focus {
-            border-color: #00ff00;
-            outline: none;
-            background: #222;
-        }
-
+        .team-input:focus { border-color: #00ff00; outline: none; background: #222; }
         .score-container { display: flex; align-items: center; gap: 15px; }
         .btn-plus-lg { width: 50px; height: 50px; background-color: #fff; color: #000; border-radius: 50%; font-size: 30px; font-weight: bold; border: none; cursor: pointer; }
         .digital-score { font-family: monospace; font-size: 100px; color: #00ff00; text-shadow: 0 0 20px rgba(0,255,0,0.5); min-width: 70px; text-align: center; cursor: pointer; }
 
-        /* 中央綜合面板 (Kzone & 測速) */
-        .center-panel { display: flex; flex-direction: column; align-items: center; gap: 15px; width: 35%; }
-        .radar-box { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .radar-display { font-family: monospace; font-size: 42px; color: #ff9500; text-shadow: 0 0 10px rgba(255,149,0,0.5); font-weight: bold; }
-        .radar-btn { padding: 8px 18px; font-size: 16px; font-weight: bold; background-color: #333; color: #fff; border: 2px solid #555; border-radius: 20px; cursor: pointer; }
+        /* 中央綜合面板 */
+        .center-panel { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 44%; }
+        .radar-box { display: flex; align-items: center; gap: 15px; }
+        .radar-display { font-family: monospace; font-size: 38px; color: #ff9500; text-shadow: 0 0 10px rgba(255,149,0,0.5); font-weight: bold; }
+        .radar-btn { padding: 6px 14px; font-size: 14px; font-weight: bold; background-color: #333; color: #fff; border: 2px solid #555; border-radius: 20px; cursor: pointer; }
         .radar-btn.timing { background-color: #ff3b30; border-color: #ff8883; animation: blink 0.8s infinite alternate; }
 
-        /* Kzone 九宮格 */
-        .kzone { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 135px; height: 160px; border: 3px solid #666; background-color: rgba(255,255,255,0.05); padding: 4px; box-shadow: 0 0 15px rgba(255,255,255,0.1); }
-        .kzone-cell { background-color: #222; border: 1px solid #444; border-radius: 3px; cursor: pointer; transition: background-color 0.2s; }
-        .kzone-cell.strike { background-color: #ff3b30; box-shadow: inset 0 0 8px #000; }
-        .kzone-cell.ball { background-color: #007aff; box-shadow: inset 0 0 8px #000; }
+        /* Kzone 外圍（壞球落點偵測區） */
+        .kzone-container {
+            position: relative;
+            width: 220px;
+            height: 250px;
+            background-color: rgba(255,255,255,0.02);
+            border: 1px dashed #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        /* Kzone 核心九宮格（好球帶） */
+        .kzone-grid {
+            width: 135px;
+            height: 165px;
+            border: 3px solid #aaa;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            background-color: rgba(255,255,255,0.06);
+            pointer-events: none; /* 讓點擊直接穿透給外層容器計算座標 */
+        }
+        .kzone-line {
+            border: 1px solid rgba(255,255,255,0.25);
+        }
+
+        /* 投球落點圓點樣式 */
+        .pitch-dot {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 13px;
+            font-weight: bold;
+            color: #fff;
+            transform: translate(-50%, -50%); /* 精確對齊點擊核心 */
+            box-shadow: 0 0 8px rgba(0,0,0,0.8), inset 0 0 4px #fff;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .pitch-dot.strike-pitch { background-color: #ff3b30; border: 1.5px solid #ff8883; } /* 好球紅點 */
+        .pitch-dot.ball-pitch { background-color: #4cd964; border: 1.5px solid #85f096; }   /* 壞球綠點 */
 
         /* 底部區域 */
         .bottom-bar { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; padding-bottom: 10px; }
@@ -96,23 +124,14 @@
            ------------------------------------------- */
         body.mode-display .ctrl-btn { display: none !important; }
         body.mode-display .top-bar { justify-content: center; }
-        body.mode-display .arrows, body.mode-display .digital-score, body.mode-display .base, body.mode-display .kzone-cell { pointer-events: none; cursor: default; }
+        body.mode-display .arrows, body.mode-display .digital-score, body.mode-display .base, body.mode-display .kzone-container { pointer-events: none; cursor: default; }
         
-        /* 顯示端隱藏輸入框的邊框背景，使其看起來像乾淨的純文字 */
-        body.mode-display .team-input {
-            background: transparent;
-            border: none;
-            pointer-events: none;
-            font-size: 36px;
-            width: auto;
-            padding: 0;
-        }
-
+        body.mode-display .team-input { background: transparent; border: none; pointer-events: none; font-size: 36px; width: auto; padding: 0; }
         body.mode-display .digital-yellow { font-size: 55px; }
         body.mode-display .digital-score { font-size: 140px; }
-        body.mode-display .center-panel { gap: 20px; }
-        body.mode-display .kzone { width: 160px; height: 190px; }
-        body.mode-display .radar-display { font-size: 55px; }
+        body.mode-display .center-panel { gap: 18px; }
+        body.mode-display .kzone-container { transform: scale(1.2); }
+        body.mode-display .radar-display { font-size: 50px; }
         body.mode-display .bases-container { transform: scale(1.3); transform-origin: left bottom; }
         body.mode-display .bso-panel { transform: scale(1.3); transform-origin: right bottom; }
     </style>
@@ -146,21 +165,18 @@
 
         <div class="center-panel">
             <div class="radar-box">
-                <div class="radar-display"><span id="speed-num">---</span> <span style="font-size: 18px;">km/h</span></div>
-                <button class="radar-btn ctrl-btn" id="radar-trigger" onclick="triggerRadar()">測速開始</button>
+                <div class="radar-display"><span id="speed-num">---</span> <span style="font-size: 16px;">km/h</span></div>
+                <button class="radar-btn ctrl-btn" id="radar-trigger" onclick="triggerRadar()">測速</button>
+                <button class="radar-btn ctrl-btn" style="background-color: #222; border-color: #444;" onclick="clearPitches()">清除落點</button>
             </div>
             
-            <div class="kzone">
-                <div class="kzone-cell" id="k-0" onclick="toggleKzone(0)"></div>
-                <div class="kzone-cell" id="k-1" onclick="toggleKzone(1)"></div>
-                <div class="kzone-cell" id="k-2" onclick="toggleKzone(2)"></div>
-                <div class="kzone-cell" id="k-3" onclick="toggleKzone(3)"></div>
-                <div class="kzone-cell" id="k-4" onclick="toggleKzone(4)"></div>
-                <div class="kzone-cell" id="k-5" onclick="toggleKzone(5)"></div>
-                <div class="kzone-cell" id="k-6" onclick="toggleKzone(6)"></div>
-                <div class="kzone-cell" id="k-7" onclick="toggleKzone(7)"></div>
-                <div class="kzone-cell" id="k-8" onclick="toggleKzone(8)"></div>
-            </div>
+            <div class="kzone-container" id="kzone-click-area" onclick="handleKzoneClick(event)">
+                <div class="kzone-grid" id="strike-zone-box">
+                    <div class="kzone-line"></div><div class="kzone-line"></div><div class="kzone-line"></div>
+                    <div class="kzone-line"></div><div class="kzone-line"></div><div class="kzone-line"></div>
+                    <div class="kzone-line"></div><div class="kzone-line"></div><div class="kzone-line"></div>
+                </div>
+                </div>
         </div>
 
         <div class="team-box">
@@ -214,10 +230,10 @@
         let state = {
             inning: 1, isTopInning: true,
             scoreTeam1: 0, scoreTeam2: 0,
-            team1Name: "團隊 1", team2Name: "團隊 2", // 新增雲端儲存欄位
+            team1Name: "團隊 1", team2Name: "團隊 2",
             balls: 0, strikes: 0, outs: 0,
             bases: [false, false, false],
-            kzone: [0,0,0,0,0,0,0,0,0],
+            pitches: [], // 儲存投球點：{ x: 百分比, y: 百分比, isStrike: 布林值 }
             currentSpeed: "---"
         };
 
@@ -262,7 +278,7 @@
                         strikes: data.strikes ?? 0,
                         outs: data.outs ?? 0,
                         bases: data.bases ?? [false, false, false],
-                        kzone: data.kzone ?? [0,0,0,0,0,0,0,0,0],
+                        pitches: data.pitches ?? [],
                         currentSpeed: data.currentSpeed ?? "---"
                     };
                 }
@@ -276,8 +292,6 @@
             document.getElementById('inning-num').innerText = state.inning;
             document.getElementById('score-team1').innerText = state.scoreTeam1;
             document.getElementById('score-team2').innerText = state.scoreTeam2;
-            
-            // 更新隊伍名稱文字 (如果是顯示端，純更新 value 即可，樣式會偽裝成純文字)
             document.getElementById('team1-name').value = state.team1Name;
             document.getElementById('team2-name').value = state.team2Name;
 
@@ -298,19 +312,67 @@
             
             document.getElementById('speed-num').innerText = state.currentSpeed;
 
-            for (let i = 0; i < 9; i++) {
-                const cell = document.getElementById(`k-${i}`);
-                cell.className = "kzone-cell";
-                if (state.kzone[i] === 1) cell.classList.add('strike');
-                else if (state.kzone[i] === 2) cell.classList.add('ball');
-            }
+            // 渲染 Kzone 的落點點點
+            renderPitchDots();
             
             if (!isDisplayMode && shouldUpload) {
                 saveToCloud();
             }
         }
 
-        // 當輸入框文字被修改時觸發雲端同步
+        // 處理 Kzone 點擊計算
+        function handleKzoneClick(event) {
+            if (isDisplayMode) return;
+
+            const container = document.getElementById('kzone-click-area');
+            const grid = document.getElementById('strike-zone-box');
+            
+            const rect = container.getBoundingClientRect();
+            const gridRect = grid.getBoundingClientRect();
+
+            // 計算點擊相對於容器的百分比座標 (用於響應式縮放對齊)
+            const clickX = ((event.clientX - rect.left) / rect.width) * 100;
+            const clickY = ((event.clientY - rect.top) / rect.height) * 100;
+
+            // 判斷點擊是否在九宮格（好球帶）的邊界範圍內
+            const isStrike = (
+                event.clientX >= gridRect.left &&
+                event.clientX <= gridRect.right &&
+                event.clientY >= gridRect.top &&
+                event.clientY <= gridRect.bottom
+            );
+
+            // 把落點加入陣列
+            state.pitches.push({ x: clickX, y: clickY, isStrike: isStrike });
+            updateDisplay();
+        }
+
+        // 動態渲染落點點點
+        function renderPitchDots() {
+            const container = document.getElementById('kzone-click-area');
+            
+            // 先清除舊的點，只保留核心九宮格外殼
+            const existingDots = container.querySelectorAll('.pitch-dot');
+            existingDots.forEach(dot => dot.remove());
+
+            // 依序重新畫出新點點
+            state.pitches.forEach((pitch, index) => {
+                const dot = document.createElement('div');
+                dot.className = `pitch-dot ${pitch.isStrike ? 'strike-pitch' : 'ball-pitch'}`;
+                dot.style.left = `${pitch.x}%`;
+                dot.style.top = `${pitch.y}%`;
+                dot.innerText = index + 1; // 自動標註第幾球
+                container.appendChild(dot);
+            });
+        }
+
+        // 一鍵清空落點功能
+        function clearPitches() {
+            if (isDisplayMode) return;
+            state.pitches = [];
+            updateDisplay();
+        }
+
         function updateTeamName() {
             if (isDisplayMode) return;
             state.team1Name = document.getElementById('team1-name').value;
@@ -324,13 +386,13 @@
             if (!isTiming) {
                 startTime = performance.now();
                 isTiming = true;
-                btn.innerText = "出手中...";
+                btn.innerText = "出手中";
                 btn.classList.add('timing');
             } else {
                 const endTime = performance.now();
                 const durationSeconds = (endTime - startTime) / 1000;
                 isTiming = false;
-                btn.innerText = "測速開始";
+                btn.innerText = "測速";
                 btn.classList.remove('timing');
 
                 if (durationSeconds > 0.02) {
@@ -343,11 +405,6 @@
             }
         }
 
-        function toggleKzone(index) {
-            if (isDisplayMode) return;
-            state.kzone[index] = (state.kzone[index] + 1) % 3;
-            updateDisplay();
-        }
         function changeScore(team, val) {
             if (team === 'team1') state.scoreTeam1 = Math.max(0, state.scoreTeam1 + val);
             else state.scoreTeam2 = Math.max(0, state.scoreTeam2 + val);
@@ -373,7 +430,7 @@
             if (state.outs >= 3) { 
                 state.outs = 0; state.balls = 0; state.strikes = 0; 
                 state.bases = [false, false, false]; 
-                state.kzone = [0,0,0,0,0,0,0,0,0];
+                state.pitches = []; // 三出局自動清空落點點點
             }
             updateDisplay();
         }
@@ -383,8 +440,8 @@
             updateDisplay(); 
         }
         function resetBoard() {
-            if (confirm("確定要重設所有數據（含隊名）嗎？")) {
-                state = { inning: 1, isTopInning: true, scoreTeam1: 0, scoreTeam2: 0, team1Name: "團隊 1", team2Name: "團隊 2", balls: 0, strikes: 0, outs: 0, bases: [false, false, false], kzone: [0,0,0,0,0,0,0,0,0], currentSpeed: "---" };
+            if (confirm("確定要重設所有數據嗎？")) {
+                state = { inning: 1, isTopInning: true, scoreTeam1: 0, scoreTeam2: 0, team1Name: "團隊 1", team2Name: "團隊 2", balls: 0, strikes: 0, outs: 0, bases: [false, false, false], pitches: [], currentSpeed: "---" };
                 updateDisplay();
             }
         }

@@ -52,17 +52,13 @@
         .counter-control { display: flex; align-items: center; gap: 10px; }
         .digital-yellow-sm { font-family: monospace; color: #e6e600; font-size: 38px; text-shadow: 0 0 10px rgba(230,230,0,0.5); min-width: 30px; text-align: center; transition: font-size 0.3s; }
 
-        /* -------------------------------------------
-           顯示端專用樣式 (當網址有 ?mode=display 時激活)
-           ------------------------------------------- */
+        /* 顯示端專用樣式 */
         body.mode-display { padding: 40px; }
-        body.mode-display .ctrl-btn { display: none !important; } /* 隱藏所有控制按鈕 */
+        body.mode-display .ctrl-btn { display: none !important; }
         body.mode-display .top-bar { justify-content: center; }
         body.mode-display .arrows { cursor: default; }
         body.mode-display .digital-score { pointer-events: none; }
         body.mode-display .base { cursor: default; }
-        
-        /* 顯示端放大字體與佈局 */
         body.mode-display .digital-yellow { font-size: 60px; }
         body.mode-display .team-name { font-size: 40px; }
         body.mode-display .digital-score { font-size: 160px; }
@@ -76,7 +72,9 @@
 <body>
 
     <div class="top-bar">
-        <div class="ctrl-btn" style="width:110px;"></div> <div class="inning-control">
+        <div class="ctrl-btn" style="width:110px;"></div>
+        
+        <div class="inning-control">
             <div class="arrows" id="arrows-click" onclick="toggleHalfInning()">
                 <div class="arrow-up" id="arrow-top"></div>
                 <div class="arrow-down" id="arrow-bottom"></div>
@@ -141,10 +139,9 @@
     </div>
 
     <script>
-        // ⚠️ 請把下方網址替換成你在 Firebase 複製的資料庫網址 ⚠️
-        const FIREBASE_URL = "https://你的專案名稱-rtdb.firebaseio.com/";
+        // 已成功替換為你的專屬 Firebase 網址
+        const FIREBASE_URL = "https://baseball-score-576dc-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
-        // 解析網址參數，檢查是不是顯示端
         const urlParams = new URLSearchParams(window.location.search);
         const isDisplayMode = urlParams.get('mode') === 'display';
 
@@ -155,19 +152,15 @@
             bases: [false, false, false]
         };
 
-        // 初始化設定
         if (isDisplayMode) {
             document.body.classList.add('mode-display');
-            document.getElementById('arrows-click').onclick = null; // 關閉顯示端點擊
-            // 顯示端：每秒向雲端拿最新資料
+            document.getElementById('arrows-click').onclick = null;
             setInterval(fetchFromCloud, 1000);
             fetchFromCloud();
         } else {
-            // 控制端：初始化本地畫面
             updateDisplay(true); 
         }
 
-        // [控制端用] 上傳到雲端
         async function saveToCloud() {
             try {
                 await fetch(`${FIREBASE_URL}/scoreboard.json`, {
@@ -179,21 +172,28 @@
             }
         }
 
-        // [顯示端用] 從雲端抓取
         async function fetchFromCloud() {
             try {
                 const response = await fetch(`${FIREBASE_URL}/scoreboard.json`);
                 const data = await response.json();
                 if (data) {
-                    state = data;
-                    updateDisplay(false); // 更新畫面，但不重複觸發上傳
+                    state = {
+                        inning: data.inning ?? 1,
+                        isTopInning: data.isTopInning ?? true,
+                        scoreTeam1: data.scoreTeam1 ?? 0,
+                        scoreTeam2: data.scoreTeam2 ?? 0,
+                        balls: data.balls ?? 0,
+                        strikes: data.strikes ?? 0,
+                        outs: data.outs ?? 0,
+                        bases: data.bases ?? [false, false, false]
+                    };
                 }
+                updateDisplay(false); 
             } catch (error) {
                 console.error("讀取雲端失敗:", error);
             }
         }
 
-        // 更新畫面顯示
         function updateDisplay(shouldUpload = true) {
             document.getElementById('inning-num').innerText = state.inning;
             document.getElementById('score-team1').innerText = state.scoreTeam1;
@@ -209,13 +209,11 @@
             document.getElementById('base2').classList.toggle('active', state.bases[1]);
             document.getElementById('base3').classList.toggle('active', state.bases[2]);
             
-            // 只有控制端操作時才同步到雲端
             if (!isDisplayMode && shouldUpload) {
                 saveToCloud();
             }
         }
 
-        // 互動邏輯（控制端專用，顯示端已被樣式阻擋點擊）
         function changeScore(team, val) {
             if (team === 'team1') state.scoreTeam1 = Math.max(0, state.scoreTeam1 + val);
             else state.scoreTeam2 = Math.max(0, state.scoreTeam2 + val);

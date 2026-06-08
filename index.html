@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>電子計分板 (整合版)</title>
+    <title>棒球電子計分版</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
         body { 
@@ -139,7 +139,6 @@
     </div>
 
     <script>
-        // 已成功替換為你的專屬 Firebase 網址
         const FIREBASE_URL = "https://baseball-score-576dc-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -152,12 +151,15 @@
             bases: [false, false, false]
         };
 
+        // 根據開啟的模式，動態修改網頁 Title 名稱
         if (isDisplayMode) {
+            document.title = "棒球電子計分版（顯示）";
             document.body.classList.add('mode-display');
             document.getElementById('arrows-click').onclick = null;
             setInterval(fetchFromCloud, 1000);
             fetchFromCloud();
         } else {
+            document.title = "棒球電子計分版（控制）";
             updateDisplay(true); 
         }
 

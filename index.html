@@ -11,7 +11,6 @@
             padding: 0; 
             user-select: none;
             -webkit-user-select: none;
-            /* 🚀 關鍵 1：澈底禁止雙擊放大、延遲優化 */
             touch-action: manipulation; 
         }
         body { 
@@ -21,48 +20,48 @@
             display: flex; 
             flex-direction: column; 
             justify-content: space-between; 
-            height: 100vh; /* 完美鎖定高度 */
-            width: 100vw;  /* 完美鎖定寬度 */
-            padding: 1.5vh 2vw; 
+            height: 100vh; 
+            width: 100vw;  
+            padding: 1vh 2vw; /* 縮減整體上下外邊距 */
             overflow: hidden; 
         }
 
         /* 頂部區域 */
-        .top-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; height: 8vh; }
-        .icon-btn { width: 7vh; height: 7vh; max-width: 45px; max-height: 45px; background-color: #fff; color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5vh; cursor: pointer; border: none; }
-        .inning-control { display: flex; align-items: center; gap: 15px; font-size: 3.5vh; font-weight: bold; }
-        .arrows { display: flex; flex-direction: column; gap: 4px; cursor: pointer; }
-        .arrow-up { width: 0; height: 0; border-left: 1vh solid transparent; border-right: 1vh solid transparent; border-bottom: 1.5vh solid #ff3b30; }
-        .arrow-down { width: 0; height: 0; border-left: 1vh solid transparent; border-right: 1vh solid transparent; border-top: 1.5vh solid #ff3b30; }
-        .digital-yellow { font-family: monospace; color: #e6e600; font-size: 5vh; text-shadow: 0 0 10px rgba(230,230,0,0.5); cursor: pointer; }
-        .btn-plus-sm { width: 5vh; height: 5vh; max-width: 35px; max-height: 35px; background-color: #fff; color: #000; border-radius: 50%; font-size: 3vh; font-weight: bold; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; height: 7vh; }
+        .icon-btn { width: 6vh; height: 6vh; max-width: 40px; max-height: 40px; background-color: #fff; color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.2vh; cursor: pointer; border: none; }
+        .inning-control { display: flex; align-items: center; gap: 12px; font-size: 3vh; font-weight: bold; }
+        .arrows { display: flex; flex-direction: column; gap: 3px; cursor: pointer; }
+        .arrow-up { width: 0; height: 0; border-left: 0.8vh solid transparent; border-right: 0.8vh solid transparent; border-bottom: 1.2vh solid #ff3b30; }
+        .arrow-down { width: 0; height: 0; border-left: 0.8vh solid transparent; border-right: 0.8vh solid transparent; border-top: 1.2vh solid #ff3b30; }
+        .digital-yellow { font-family: monospace; color: #e6e600; font-size: 4.5vh; text-shadow: 0 0 10px rgba(230,230,0,0.5); cursor: pointer; }
+        .btn-plus-sm { width: 4.5vh; height: 4.5vh; max-width: 32px; max-height: 32px; background-color: #fff; color: #000; border-radius: 50%; font-size: 2.5vh; font-weight: bold; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; }
 
-        /* 中部區域：自適應黃金比例佈局 */
-        .main-scoreboard { display: flex; justify-content: space-between; align-items: center; width: 100%; height: 50vh; flex-grow: 1; }
-        .team-box { display: flex; flex-direction: column; align-items: center; gap: 2vh; width: 28%; }
+        /* 中部區域：縮緊緊湊型高度，專治平板溢出 */
+        .main-scoreboard { display: flex; justify-content: space-between; align-items: center; width: 100%; height: 48vh; flex-grow: 1; margin: 5px 0; }
+        .team-box { display: flex; flex-direction: column; align-items: center; gap: 1vh; width: 28%; }
         
         .team-input {
             background: #111; color: #fff; border: 1px solid #444; border-radius: 6px;
-            font-size: 3vh; font-weight: bold; text-align: center; width: 90%; padding: 4px; user-select: text; -webkit-user-select: text;
+            font-size: 2.5vh; font-weight: bold; text-align: center; width: 90%; padding: 3px; user-select: text; -webkit-user-select: text;
         }
         .team-input:focus { border-color: #00ff00; outline: none; background: #222; }
-        .score-container { display: flex; align-items: center; gap: 1.5vw; }
-        .btn-plus-lg { width: 8vh; height: 8vh; max-width: 55px; max-height: 55px; background-color: #fff; color: #000; border-radius: 50%; font-size: 4vh; font-weight: bold; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-        .digital-score { font-family: monospace; font-size: 15vh; color: #00ff00; text-shadow: 0 0 20px rgba(0,255,0,0.5); min-width: 10vh; text-align: center; cursor: pointer; }
+        .score-container { display: flex; align-items: center; gap: 1vw; }
+        .btn-plus-lg { width: 7vh; height: 7vh; max-width: 50px; max-height: 50px; background-color: #fff; color: #000; border-radius: 50%; font-size: 3.5vh; font-weight: bold; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+        .digital-score { font-family: monospace; font-size: 13vh; color: #00ff00; text-shadow: 0 0 20px rgba(0,255,0,0.5); min-width: 9vh; text-align: center; cursor: pointer; }
 
         /* 中央綜合面板 */
-        .center-panel { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5vh; width: 44%; height: 100%; }
-        .radar-box { display: flex; align-items: center; gap: 8px; justify-content: center; width: 100%; }
-        .radar-display { font-family: monospace; font-size: 4.5vh; color: #ff9500; text-shadow: 0 0 10px rgba(255,149,0,0.5); font-weight: bold; }
-        .radar-btn { padding: 6px 12px; font-size: 1.8vh; font-weight: bold; background-color: #333; color: #fff; border: 1px solid #555; border-radius: 20px; cursor: pointer; white-space: nowrap; }
+        .center-panel { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1vh; width: 44%; height: 100%; }
+        .radar-box { display: flex; align-items: center; gap: 6px; justify-content: center; width: 100%; }
+        .radar-display { font-family: monospace; font-size: 4vh; color: #ff9500; text-shadow: 0 0 10px rgba(255,149,0,0.5); font-weight: bold; }
+        .radar-btn { padding: 5px 10px; font-size: 1.6vh; font-weight: bold; background-color: #333; color: #fff; border: 1px solid #555; border-radius: 20px; cursor: pointer; white-space: nowrap; }
         .radar-btn.timing { background-color: #ff3b30; border-color: #ff8883; animation: blink 0.8s infinite alternate; }
 
-        /* 🚀 關鍵 2：Kzone 改用 vh/vw 響應式比例，完美符合任何螢幕大小 */
+        /* Kzone 自適應小型化 */
         .kzone-container {
             position: relative;
             width: 100%;
-            max-width: 26vh; /* 高度反推寬度，確保任何手機都不變形 */
-            height: 30vh;
+            max-width: 22vh; /* 高度反推，嚴格限縮最大尺寸防止撐開 */
+            height: 26vh;
             background-color: rgba(255,255,255,0.02);
             border: 1px dashed #333;
             display: flex;
@@ -75,7 +74,7 @@
         .kzone-grid {
             width: 65%;
             height: 68%;
-            border: 3px solid #aaa;
+            border: 2px solid #aaa;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
@@ -87,42 +86,40 @@
         /* 投球落點圓點 */
         .pitch-dot {
             position: absolute;
-            width: 3.2vh;
-            height: 3.2vh;
-            max-width: 24px;
-            max-height: 24px;
+            width: 2.8vh;
+            height: 2.8vh;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.8vh;
+            font-size: 1.5vh;
             font-weight: bold;
             color: #fff;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 6px rgba(0,0,0,0.8), inset 0 0 4px #fff;
+            box-shadow: 0 0 5px rgba(0,0,0,0.8), inset 0 0 3px #fff;
             pointer-events: none;
             z-index: 10;
         }
         .pitch-dot.strike-pitch { background-color: #ff3b30; border: 1px solid #ff8883; }
         .pitch-dot.ball-pitch { background-color: #4cd964; border: 1px solid #85f096; }
 
-        /* 底部區域 */
-        .bottom-bar { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; height: 22vh; padding-bottom: 1vh; }
-        .bases-container { position: relative; width: 16vh; height: 16vh; }
-        .base { position: absolute; width: 4.2vh; height: 4.2vh; border: 2px solid #fff; transform: rotate(45deg); cursor: pointer; transition: background-color 0.2s; }
+        /* 底部區域：限縮高度 */
+        .bottom-bar { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; height: 18vh; padding-bottom: 0.5vh; }
+        .bases-container { position: relative; width: 13vh; height: 13vh; }
+        .base { position: absolute; width: 3.5vh; height: 3.5vh; border: 2px solid #fff; transform: rotate(45deg); cursor: pointer; transition: background-color 0.2s; }
         .base.active { background-color: #00ff00; box-shadow: 0 0 10px #00ff00; }
         .base-1 { top: 35%; right: 10%; }
         .base-2 { top: 10%; left: 35%; }
         .base-3 { top: 35%; left: 10%; }
 
         /* BSO 面板 */
-        .bso-panel { display: flex; flex-direction: column; gap: 1vh; background-color: #111; padding: 1.5vh 2vh; border-radius: 8px; border: 1px solid #333; }
-        .bso-row { display: flex; align-items: center; gap: 15px; }
-        .bso-label { width: 4vh; height: 4vh; background-color: #333; color: #bbb; border-radius: 6px; display: flex; justify-content: center; align-items: center; font-size: 2.2vh; font-weight: bold; }
+        .bso-panel { display: flex; flex-direction: column; gap: 0.6vh; background-color: #111; padding: 1vh 1.5vh; border-radius: 8px; border: 1px solid #333; }
+        .bso-row { display: flex; align-items: center; gap: 12px; }
+        .bso-label { width: 3.5vh; height: 3.5vh; background-color: #333; color: #bbb; border-radius: 6px; display: flex; justify-content: center; align-items: center; font-size: 2vh; font-weight: bold; }
         body:not(.mode-display) .bso-label { cursor: pointer; }
-        .bso-dots { display: flex; gap: 8px; }
+        .bso-dots { display: flex; gap: 6px; }
         body:not(.mode-display) .bso-dots { cursor: pointer; }
-        .dot { width: 3.2vh; height: 3.2vh; border-radius: 50%; background-color: #222; border: 2px solid #444; box-shadow: inset 0 0 5px #000; }
+        .dot { width: 2.6vh; height: 2.6vh; border-radius: 50%; background-color: #222; border: 2px solid #444; box-shadow: inset 0 0 5px #000; }
         .dot.ball-active { background-color: #00ff00; border-color: #88ff88; box-shadow: 0 0 10px #00ff00; }
         .dot.strike-active { background-color: #ffcc00; border-color: #ffea88; box-shadow: 0 0 10px #ffcc00; }
         .dot.out-active { background-color: #ff3b30; border-color: #ff8883; box-shadow: 0 0 10px #ff3b30; }
@@ -130,7 +127,7 @@
         @keyframes blink { from { opacity: 1; } to { opacity: 0.5; } }
 
         /* -------------------------------------------
-           顯示端唯讀與放大佈局（完美自適應）
+           顯示端唯讀與放大佈局
            ------------------------------------------- */
         body.mode-display .ctrl-btn { display: none !important; }
         body.mode-display .top-bar { justify-content: center; }
@@ -177,7 +174,7 @@
 
         <div class="center-panel">
             <div class="radar-box">
-                <div class="radar-display"><span id="speed-num">---</span> <span style="font-size: 2vh;">km/h</span></div>
+                <div class="radar-display"><span id="speed-num">---</span> <span style="font-size: 1.8vh;">km/h</span></div>
                 <button class="radar-btn ctrl-btn" id="radar-trigger" onclick="triggerRadar()">測速</button>
                 <button class="radar-btn ctrl-btn" style="background-color: #970000; border-color: #ff5555;" onclick="popPitch()">減 1</button>
                 <button class="radar-btn ctrl-btn" style="background-color: #222; border-color: #444;" onclick="clearPitches()">清除</button>
@@ -253,16 +250,20 @@
         let state = { ...DEFAULT_STATE };
         let startTime = null;
         let isTiming = false;
+        let lastTouchEnd = 0;
 
-        // 🚀 關鍵 4：澈底阻斷 iOS 點兩下放大的 JavaScript 核心防禦
+        // 🚀 修正防雙擊放大核心：允許測速按鈕連點不受限制
         document.addEventListener('touchend', function (event) {
+            // 💡 白名單檢查：如果是測速按鈕，放行不阻斷
+            if (event.target && event.target.id === 'radar-trigger') {
+                return; 
+            }
             const now = (new Date()).getTime();
             if (now - lastTouchEnd <= 300) {
-                event.preventDefault(); // 阻斷雙擊放大
+                event.preventDefault(); 
             }
             lastTouchEnd = now;
         }, false);
-        let lastTouchEnd = 0;
 
         if (isDisplayMode) {
             document.title = "棒球電子計分版（顯示）";
@@ -279,7 +280,6 @@
             updateDisplay(true); 
         }
 
-        // 🚀 關鍵 5：異步背景傳輸（Optimistic UI 渲染），畫面先更新、網路慢慢傳，完全擺脫延遲！
         async function saveToCloud() {
             localStorage.setItem('baseball_scoreboard_state', JSON.stringify(state));
             fetch(`${FIREBASE_URL}/scoreboard.json`, {
@@ -370,12 +370,17 @@
             });
         }
 
-        // 🚀 落點減 1 核心邏輯
         function popPitch() {
             if (isDisplayMode || state.pitches.length === 0) return;
-            state.pitches.pop(); // 彈出最後一球
+            state.pitches.pop(); 
             updateDisplay();
         }
+
+        document.getElementById('radar-trigger').addEventListener('touchstart', function(e) {
+            // 行動端直接在 touchstart 觸發，澈底根絕點擊延遲
+            e.preventDefault();
+            triggerRadar();
+        });
 
         function clearPitches() {
             if (isDisplayMode) return;

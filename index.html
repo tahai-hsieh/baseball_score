@@ -38,7 +38,7 @@
         .digital-score { font-family: monospace; font-size: 110px; color: #00ff00; text-shadow: 0 0 20px rgba(0,255,0,0.5); min-width: 80px; text-align: center; cursor: pointer; transition: font-size 0.3s; }
         .vs-sign { font-size: 45px; transition: font-size 0.3s; }
 
-        /* 底部區域：壘包與計數 */
+        /* 底部區域：壘包與 BSO 燈號 */
         .bottom-bar { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; padding-bottom: 20px; }
         .bases-container { position: relative; width: 120px; height: 120px; transition: transform 0.3s; }
         .base { position: absolute; width: 32px; height: 32px; border: 2px solid #fff; transform: rotate(45deg); cursor: pointer; transition: background-color 0.2s; }
@@ -46,11 +46,65 @@
         .base-1 { top: 40px; right: 10px; }
         .base-2 { top: 5px; left: 44px; }
         .base-3 { top: 40px; left: 10px; }
-        .counters { display: flex; gap: 40px; align-items: center; }
-        .counter-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .counter-label { font-size: 22px; font-weight: bold; transition: font-size 0.3s; }
-        .counter-control { display: flex; align-items: center; gap: 10px; }
-        .digital-yellow-sm { font-family: monospace; color: #e6e600; font-size: 38px; text-shadow: 0 0 10px rgba(230,230,0,0.5); min-width: 30px; text-align: center; transition: font-size 0.3s; }
+
+        /* BSO 燈號面板樣式 */
+        .bso-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: #111;
+            padding: 12px 18px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        .bso-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .bso-label {
+            width: 32px;
+            height: 32px;
+            background-color: #333;
+            color: #bbb;
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.8);
+        }
+        /* 控制端專用：點擊標籤可以減球數 */
+        body:not(.mode-display) .bso-label {
+            cursor: pointer;
+        }
+        body:not(.mode-display) .bso-label:active {
+            background-color: #555;
+        }
+        .bso-dots {
+            display: flex;
+            gap: 10px;
+        }
+        .dot {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background-color: #222;
+            border: 2px solid #444;
+            box-shadow: inset 0 0 6px rgba(0,0,0,0.9);
+            transition: background-color 0.15s, box-shadow 0.15s;
+        }
+        /* 控制端專用：點擊燈號本身可以加球數 */
+        body:not(.mode-display) .bso-dots {
+            cursor: pointer;
+        }
+
+        /* 燈號亮起顏色 */
+        .dot.ball-active { background-color: #00ff00; border-color: #88ff88; box-shadow: 0 0 12px #00ff00, inset 0 0 4px #fff; }
+        .dot.strike-active { background-color: #ffcc00; border-color: #ffea88; box-shadow: 0 0 12px #ffcc00, inset 0 0 4px #fff; }
+        .dot.out-active { background-color: #ff3b30; border-color: #ff8883; box-shadow: 0 0 12px #ff3b30, inset 0 0 4px #fff; }
 
         /* 顯示端專用樣式 */
         body.mode-display { padding: 40px; }
@@ -63,9 +117,8 @@
         body.mode-display .team-name { font-size: 40px; }
         body.mode-display .digital-score { font-size: 160px; }
         body.mode-display .vs-sign { font-size: 60px; }
-        body.mode-display .counter-label { font-size: 30px; }
-        body.mode-display .digital-yellow-sm { font-size: 50px; }
-        body.mode-display .bases-container { transform: scale(1.25); transform-origin: left bottom; }
+        body.mode-display .bases-container { transform: scale(1.4); transform-origin: left bottom; }
+        body.mode-display .bso-panel { transform: scale(1.35); transform-origin: right bottom; padding: 15px 22px; }
         body.mode-display .bottom-bar { padding-bottom: 40px; }
     </style>
 </head>
@@ -116,23 +169,27 @@
             <div class="base base-3" id="base3" onclick="toggleBase(3)"></div>
         </div>
 
-        <div class="counters">
-            <div class="counter-group">
-                <div class="counter-label">球 / 擊球</div>
-                <div class="counter-control">
-                    <button class="btn-plus-sm ctrl-btn" onclick="changeBall(1)">+</button>
-                    <span class="digital-yellow-sm" id="ball-count">0</span>
-                    <span style="color:#e6e600; font-size:24px;">-</span>
-                    <span class="digital-yellow-sm" id="strike-count">0</span>
-                    <button class="btn-plus-sm ctrl-btn" onclick="changeStrike(1)">+</button>
+        <div class="bso-panel">
+            <div class="bso-row">
+                <div class="bso-label" title="點擊減少壞球" onclick="changeBall(-1)">B</div>
+                <div class="bso-dots" onclick="changeBall(1)">
+                    <div class="dot" id="b-dot-1"></div>
+                    <div class="dot" id="b-dot-2"></div>
+                    <div class="dot" id="b-dot-3"></div>
                 </div>
             </div>
-
-            <div class="counter-group">
-                <div class="counter-label">出局</div>
-                <div class="counter-control">
-                    <span class="digital-yellow-sm" id="out-count">0</span>
-                    <button class="btn-plus-sm ctrl-btn" onclick="changeOut(1)">+</button>
+            <div class="bso-row">
+                <div class="bso-label" title="點擊減少好球" onclick="changeStrike(-1)">S</div>
+                <div class="bso-dots" onclick="changeStrike(1)">
+                    <div class="dot" id="s-dot-1"></div>
+                    <div class="dot" id="s-dot-2"></div>
+                </div>
+            </div>
+            <div class="bso-row">
+                <div class="bso-label" title="點擊減少出局" onclick="changeOut(-1)">O</div>
+                <div class="bso-dots" onclick="changeOut(1)">
+                    <div class="dot" id="o-dot-1"></div>
+                    <div class="dot" id="o-dot-2"></div>
                 </div>
             </div>
         </div>
@@ -151,7 +208,6 @@
             bases: [false, false, false]
         };
 
-        // 根據開啟的模式，動態修改網頁 Title 名稱
         if (isDisplayMode) {
             document.title = "棒球電子計分版（顯示）";
             document.body.classList.add('mode-display');
@@ -197,19 +253,30 @@
         }
 
         function updateDisplay(shouldUpload = true) {
+            // 更新基礎文字與比分
             document.getElementById('inning-num').innerText = state.inning;
             document.getElementById('score-team1').innerText = state.scoreTeam1;
             document.getElementById('score-team2').innerText = state.scoreTeam2;
-            document.getElementById('ball-count').innerText = state.balls;
-            document.getElementById('strike-count').innerText = state.strikes;
-            document.getElementById('out-count').innerText = state.outs;
-
             document.getElementById('arrow-top').style.opacity = state.isTopInning ? '1' : '0.3';
             document.getElementById('arrow-bottom').style.opacity = state.isTopInning ? '0.3' : '1';
 
+            // 更新壘包
             document.getElementById('base1').classList.toggle('active', state.bases[0]);
             document.getElementById('base2').classList.toggle('active', state.bases[1]);
             document.getElementById('base3').classList.toggle('active', state.bases[2]);
+            
+            // 點亮 B 壞球燈號 (1~3)
+            document.getElementById('b-dot-1').classList.toggle('ball-active', state.balls >= 1);
+            document.getElementById('b-dot-2').classList.toggle('ball-active', state.balls >= 2);
+            document.getElementById('b-dot-3').classList.toggle('ball-active', state.balls >= 3);
+
+            // 點亮 S 好球燈號 (1~2)
+            document.getElementById('s-dot-1').classList.toggle('strike-active', state.strikes >= 1);
+            document.getElementById('s-dot-2').classList.toggle('strike-active', state.strikes >= 2);
+
+            // 點亮 O 出局燈號 (1~2)
+            document.getElementById('o-dot-1').classList.toggle('out-active', state.outs >= 1);
+            document.getElementById('o-dot-2').classList.toggle('out-active', state.outs >= 2);
             
             if (!isDisplayMode && shouldUpload) {
                 saveToCloud();
@@ -223,22 +290,34 @@
         }
         function changeInning(val) { state.inning = Math.max(1, state.inning + val); updateDisplay(); }
         function toggleHalfInning() { state.isTopInning = !state.isTopInning; updateDisplay(); }
+        
+        // 壞球調整
         function changeBall(val) {
-            state.balls += val;
+            if (isDisplayMode) return;
+            state.balls = Math.max(0, state.balls + val);
             if (state.balls >= 4) { state.balls = 0; state.strikes = 0; }
             updateDisplay();
         }
+        // 好球調整
         function changeStrike(val) {
-            state.strikes += val;
+            if (isDisplayMode) return;
+            state.strikes = Math.max(0, state.strikes + val);
             if (state.strikes >= 3) { state.strikes = 0; state.balls = 0; changeOut(1); }
             updateDisplay();
         }
+        // 出局數調整
         function changeOut(val) {
-            state.outs += val;
+            if (isDisplayMode) return;
+            state.outs = Math.max(0, state.outs + val);
             if (state.outs >= 3) { state.outs = 0; state.balls = 0; state.strikes = 0; state.bases = [false, false, false]; }
             updateDisplay();
         }
-        function toggleBase(baseNum) { state.bases[baseNum - 1] = !state.bases[baseNum - 1]; updateDisplay(); }
+        
+        function toggleBase(baseNum) { 
+            if (isDisplayMode) return;
+            state.bases[baseNum - 1] = !state.bases[baseNum - 1]; 
+            updateDisplay(); 
+        }
         function resetBoard() {
             if (confirm("確定要重設所有數據嗎？")) {
                 state = { inning: 1, isTopInning: true, scoreTeam1: 0, scoreTeam2: 0, balls: 0, strikes: 0, outs: 0, bases: [false, false, false] };

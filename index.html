@@ -24,7 +24,7 @@
         .inning-control { display: flex; align-items: center; gap: 15px; font-size: 26px; font-weight: bold; }
         .arrows { display: flex; flex-direction: column; gap: 5px; cursor: pointer; }
         .arrow-up { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 15px solid #ff3b30; }
-        .arrow-down { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 15px solid #ff3b30; }
+        .arrow-down { width: 0; height: 0; border-left: 10px solid transparent; border-right: 12px solid transparent; border-top: 15px solid #ff3b30; }
         .digital-yellow { font-family: monospace; color: #e6e600; font-size: 40px; text-shadow: 0 0 10px rgba(230,230,0,0.5); }
         .btn-plus-sm { width: 35px; height: 35px; background-color: #fff; color: #000; border-radius: 50%; font-size: 22px; font-weight: bold; border: none; cursor: pointer; }
 
@@ -48,7 +48,7 @@
         .radar-btn { padding: 6px 14px; font-size: 14px; font-weight: bold; background-color: #333; color: #fff; border: 2px solid #555; border-radius: 20px; cursor: pointer; }
         .radar-btn.timing { background-color: #ff3b30; border-color: #ff8883; animation: blink 0.8s infinite alternate; }
 
-        /* Kzone 外圍（壞球落點偵測區） */
+        /* Kzone 外圍 */
         .kzone-container {
             position: relative;
             width: 220px;
@@ -61,7 +61,7 @@
             cursor: pointer;
         }
         
-        /* Kzone 核心九宮格（好球帶） */
+        /* Kzone 核心九宮格 */
         .kzone-grid {
             width: 135px;
             height: 165px;
@@ -70,13 +70,11 @@
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
             background-color: rgba(255,255,255,0.06);
-            pointer-events: none; /* 讓點擊直接穿透給外層容器計算座標 */
+            pointer-events: none;
         }
-        .kzone-line {
-            border: 1px solid rgba(255,255,255,0.25);
-        }
+        .kzone-line { border: 1px solid rgba(255,255,255,0.25); }
 
-        /* 投球落點圓點樣式 */
+        /* 投球落點圓點 */
         .pitch-dot {
             position: absolute;
             width: 22px;
@@ -88,13 +86,13 @@
             font-size: 13px;
             font-weight: bold;
             color: #fff;
-            transform: translate(-50%, -50%); /* 精確對齊點擊核心 */
+            transform: translate(-50%, -50%);
             box-shadow: 0 0 8px rgba(0,0,0,0.8), inset 0 0 4px #fff;
             pointer-events: none;
             z-index: 10;
         }
-        .pitch-dot.strike-pitch { background-color: #ff3b30; border: 1.5px solid #ff8883; } /* 好球紅點 */
-        .pitch-dot.ball-pitch { background-color: #4cd964; border: 1.5px solid #85f096; }   /* 壞球綠點 */
+        .pitch-dot.strike-pitch { background-color: #ff3b30; border: 1.5px solid #ff8883; }
+        .pitch-dot.ball-pitch { background-color: #4cd964; border: 1.5px solid #85f096; }
 
         /* 底部區域 */
         .bottom-bar { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; padding-bottom: 10px; }
@@ -120,7 +118,7 @@
         @keyframes blink { from { opacity: 1; } to { opacity: 0.5; } }
 
         /* -------------------------------------------
-           顯示端唯讀與放大佈局
+           顯示端唯讀與放大佈局（已拉開測速與Kzone間距）
            ------------------------------------------- */
         body.mode-display .ctrl-btn { display: none !important; }
         body.mode-display .top-bar { justify-content: center; }
@@ -129,8 +127,12 @@
         body.mode-display .team-input { background: transparent; border: none; pointer-events: none; font-size: 36px; width: auto; padding: 0; }
         body.mode-display .digital-yellow { font-size: 55px; }
         body.mode-display .digital-score { font-size: 140px; }
-        body.mode-display .center-panel { gap: 18px; }
+        
+        /* 🛠️ 顯示端間距優化：拉高綜合面板間距，並拉開測速與 Kzone 的上下距離 */
+        body.mode-display .center-panel { gap: 35px; margin-top: -20px; } 
+        body.mode-display .radar-box { margin-bottom: 10px; }
         body.mode-display .kzone-container { transform: scale(1.2); }
+        
         body.mode-display .radar-display { font-size: 50px; }
         body.mode-display .bases-container { transform: scale(1.3); transform-origin: left bottom; }
         body.mode-display .bso-panel { transform: scale(1.3); transform-origin: right bottom; }
@@ -139,7 +141,8 @@
 <body>
 
     <div class="top-bar">
-        <div class="ctrl-btn" style="width:110px;"></div>
+        <button class="icon-btn ctrl-btn" title="重新整理數據（全部清空）" onclick="resetBoard()">🔄</button>
+        
         <div class="inning-control">
             <div class="arrows" id="arrows-click" onclick="toggleHalfInning()">
                 <div class="arrow-up" id="arrow-top"></div>
@@ -149,10 +152,7 @@
             <span class="digital-yellow" id="inning-num">1</span>
             <button class="btn-plus-sm ctrl-btn" onclick="changeInning(1)">+</button>
         </div>
-        <div class="right-icons ctrl-btn">
-            <button class="icon-btn" onclick="resetBoard()">🔄</button>
-        </div>
-    </div>
+        <div class="ctrl-btn" style="width:45px;"></div> </div>
 
     <div class="main-scoreboard">
         <div class="team-box">
@@ -176,7 +176,7 @@
                     <div class="kzone-line"></div><div class="kzone-line"></div><div class="kzone-line"></div>
                     <div class="kzone-line"></div><div class="kzone-line"></div><div class="kzone-line"></div>
                 </div>
-                </div>
+            </div>
         </div>
 
         <div class="team-box">
@@ -227,19 +227,22 @@
         const urlParams = new URLSearchParams(window.location.search);
         const isDisplayMode = urlParams.get('mode') === 'display';
 
-        let state = {
+        // 預設初始值
+        const DEFAULT_STATE = {
             inning: 1, isTopInning: true,
             scoreTeam1: 0, scoreTeam2: 0,
             team1Name: "團隊 1", team2Name: "團隊 2",
             balls: 0, strikes: 0, outs: 0,
             bases: [false, false, false],
-            pitches: [], // 儲存投球點：{ x: 百分比, y: 百分比, isStrike: 布林值 }
+            pitches: [],
             currentSpeed: "---"
         };
 
+        let state = { ...DEFAULT_STATE };
         let startTime = null;
         let isTiming = false;
 
+        // 初始化載入邏輯
         if (isDisplayMode) {
             document.title = "棒球電子計分版（顯示）";
             document.body.classList.add('mode-display');
@@ -248,11 +251,23 @@
             fetchFromCloud();
         } else {
             document.title = "棒球電子計分版（控制）";
+            // 💡 讀取本地快取記憶庫，防重新整理遺失資料
+            const localSaved = localStorage.getItem('baseball_scoreboard_state');
+            if (localSaved) {
+                try {
+                    state = JSON.parse(localSaved);
+                } catch(e) {
+                    state = { ...DEFAULT_STATE };
+                }
+            }
             updateDisplay(true); 
         }
 
         async function saveToCloud() {
             try {
+                // 控制端存入雲端同時，也備份一份到瀏覽器本地儲存庫
+                localStorage.setItem('baseball_scoreboard_state', JSON.stringify(state));
+                
                 await fetch(`${FIREBASE_URL}/scoreboard.json`, {
                     method: 'PUT',
                     body: JSON.stringify(state)
@@ -312,7 +327,6 @@
             
             document.getElementById('speed-num').innerText = state.currentSpeed;
 
-            // 渲染 Kzone 的落點點點
             renderPitchDots();
             
             if (!isDisplayMode && shouldUpload) {
@@ -320,21 +334,16 @@
             }
         }
 
-        // 處理 Kzone 點擊計算
         function handleKzoneClick(event) {
             if (isDisplayMode) return;
-
             const container = document.getElementById('kzone-click-area');
             const grid = document.getElementById('strike-zone-box');
-            
             const rect = container.getBoundingClientRect();
             const gridRect = grid.getBoundingClientRect();
 
-            // 計算點擊相對於容器的百分比座標 (用於響應式縮放對齊)
             const clickX = ((event.clientX - rect.left) / rect.width) * 100;
             const clickY = ((event.clientY - rect.top) / rect.height) * 100;
 
-            // 判斷點擊是否在九宮格（好球帶）的邊界範圍內
             const isStrike = (
                 event.clientX >= gridRect.left &&
                 event.clientX <= gridRect.right &&
@@ -342,31 +351,25 @@
                 event.clientY <= gridRect.bottom
             );
 
-            // 把落點加入陣列
             state.pitches.push({ x: clickX, y: clickY, isStrike: isStrike });
             updateDisplay();
         }
 
-        // 動態渲染落點點點
         function renderPitchDots() {
             const container = document.getElementById('kzone-click-area');
-            
-            // 先清除舊的點，只保留核心九宮格外殼
             const existingDots = container.querySelectorAll('.pitch-dot');
             existingDots.forEach(dot => dot.remove());
 
-            // 依序重新畫出新點點
             state.pitches.forEach((pitch, index) => {
                 const dot = document.createElement('div');
                 dot.className = `pitch-dot ${pitch.isStrike ? 'strike-pitch' : 'ball-pitch'}`;
                 dot.style.left = `${pitch.x}%`;
                 dot.style.top = `${pitch.y}%`;
-                dot.innerText = index + 1; // 自動標註第幾球
+                dot.innerText = index + 1;
                 container.appendChild(dot);
             });
         }
 
-        // 一鍵清空落點功能
         function clearPitches() {
             if (isDisplayMode) return;
             state.pitches = [];
@@ -430,7 +433,7 @@
             if (state.outs >= 3) { 
                 state.outs = 0; state.balls = 0; state.strikes = 0; 
                 state.bases = [false, false, false]; 
-                state.pitches = []; // 三出局自動清空落點點點
+                state.pitches = [];
             }
             updateDisplay();
         }
@@ -439,10 +442,13 @@
             state.bases[baseNum - 1] = !state.bases[baseNum - 1]; 
             updateDisplay(); 
         }
+
+        // 💡 只有手動按下頂部 🔄 按鈕並選確認，才會真正洗掉所有本地與雲端的比賽資料
         function resetBoard() {
-            if (confirm("確定要重設所有數據嗎？")) {
-                state = { inning: 1, isTopInning: true, scoreTeam1: 0, scoreTeam2: 0, team1Name: "團隊 1", team2Name: "團隊 2", balls: 0, strikes: 0, outs: 0, bases: [false, false, false], pitches: [], currentSpeed: "---" };
-                updateDisplay();
+            if (confirm("【⚠️ 重新整理數據警告】確定要全部清空並重新開始一場新比賽嗎？")) {
+                state = { ...DEFAULT_STATE };
+                localStorage.removeItem('baseball_scoreboard_state'); // 清除本地記憶
+                updateDisplay(true);
             }
         }
     </script>
